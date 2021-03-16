@@ -1,6 +1,9 @@
+#!./flask/Scripts/python
+# relational database module
 import psycopg2
 from config import config
-
+import json
+import logging
 SQL_GET_FILES='''SELECT sf."Id", sf."AWS_Identifier", sf."Created_At"
 FROM public."S3_Files" sf;'''
 
@@ -10,21 +13,13 @@ def test_connect():
     try:
         # read connection parameters
         params = config()
-
-        # connect to the PostgreSQL server
-        print('Connecting to the PostgreSQL database...')
-        conn = psycopg2.connect(**params)
-		
+        conn = psycopg2.connect(**params)		
         # create a cursor
         cur = conn.cursor()
-        
-	# execute a statement
-        print('PostgreSQL database version:')
         cur.execute('SELECT version()')
-
         # display the PostgreSQL database server version
         db_version = cur.fetchone()
-        print(db_version)
+        return db_version[0]
        
 	# close the communication with the PostgreSQL
         cur.close()
@@ -42,17 +37,27 @@ def get_s3_files():
         conn = psycopg2.connect(**params)
         cur = conn.cursor()
         cur.execute(SQL_GET_FILES)
+
         rows = cur.fetchall()
-        print("The number of parts: ", cur.rowcount)
-        for row in rows:
-            print(row)
+        objects = [
+            {
+                'Id': row[0],
+                'AWS_Identifier':row[1]
+                # 'Created_At':row[2] #Object of type datetime is not JSON serializable
+            } for row in rows
+        ] #
+        json_output = json.dumps(objects)
+        return json_output
+        #print("The number of parts: ", cur.rowcount)
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
+        logging.exception("SOME DB lever error")
+        return "exception has occured.."
     finally:
         if conn is not None:
             conn.close()
 
 
 if __name__ == '__main__':
-    get_s3_files()
+    output=get_s3_files();
+    print(output);

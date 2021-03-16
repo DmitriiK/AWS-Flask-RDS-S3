@@ -1,6 +1,6 @@
-#!./flask/Scripts/python
+#!flask/bin/python
 from flask import Flask, jsonify, abort
-import rdb_store as rdb
+
 app = Flask(__name__)
 
 tasks = [
@@ -25,19 +25,11 @@ def get_tasks():
 @app.route('/todo/api/v1.0/tasks/<int:task_id>', methods=['GET'])
 def get_task(task_id):
     task = [task for task in tasks if task['id'] == task_id]
-    if len(task) == 0:
+    if len(task) == 0:/todo/api/v1.0/tasks
         abort(404)
     return jsonify({'task': task[0]})
 
-@app.route('/test_rdb_connect', methods=['GET'])
-def test_rdb_connect():
-    result =rdb.test_connect()
-    return result  
-
-@app.route('/get_images_list', methods=['GET'])
-def get_images_list():
-    result =rdb.get_s3_files()
-    return result    
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
