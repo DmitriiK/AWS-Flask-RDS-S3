@@ -23,7 +23,7 @@ def upload_form():
 	return render_template('index.html')
 
 
-@app.route('/file-upload', methods=['POST'])
+@app.route('/file_upload', methods=['POST'])
 def upload_file():
 	# check if the post request has the file part
 	if 'file' not in request.files:
