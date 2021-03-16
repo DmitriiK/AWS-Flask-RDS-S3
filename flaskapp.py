@@ -4,16 +4,12 @@ import os
 import urllib.request
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = 'D:/share'
-
-app = Flask(__name__)
-app.secret_key = "secret key"
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-
 import rdb_store as rdb
 
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+UPLOAD_FOLDER = 'D:/share'
+ALLOWED_EXTENSIONS = set([ 'png', 'jpg', 'jpeg', 'gif'])
+app = Flask(__name__)
+
 
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -37,12 +33,12 @@ def upload_file():
 		return resp
 	if file and allowed_file(file.filename):
 		filename = secure_filename(file.filename)
-		file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+		file.save(os.path.join(UPLOAD_FOLDER, filename))
 		resp = jsonify({'message' : 'File successfully uploaded'})
 		resp.status_code = 201
 		return resp
 	else:
-		resp = jsonify({'message' : 'Allowed file types are txt, pdf, png, jpg, jpeg, gif'})
+		resp = jsonify({'message' : 'Allowed file types are  png, jpg, jpeg, gif'})
 		resp.status_code = 400
 		return resp
 
