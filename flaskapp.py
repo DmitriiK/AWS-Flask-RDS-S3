@@ -3,6 +3,8 @@ from flask import Flask, jsonify, abort, request, redirect, render_template
 import os
 import urllib.request
 from werkzeug.utils import secure_filename
+from imageio import imread
+
 import s3
 import rdb_store as rdb
 
@@ -51,7 +53,15 @@ def test_rdb_connect():
 @app.route('/get_images_list', methods=['GET'])
 def get_images_list():
     result =rdb.get_s3_files()
-    return result    
+    return result  
+
+@app.route('/get_random_image', methods=['GET'])
+def get_random_image():
+    url =rdb.get_single_s3_file()
+    return redirect(url)    
+    ##image = imread(url)
+    
+   
 
 if __name__ == '__main__':
     app.run(debug=True)

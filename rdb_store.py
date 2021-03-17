@@ -4,10 +4,23 @@ import psycopg2
 from config import db_config
 import json
 import logging
-SQL_GET_FILES='''SELECT sf.Id, sf.PublicUrl, sf.FileName, sf.Created_At FROM public.S3_Files sf;'''
-SQL_SET_FILES="INSERT INTO public.S3_Files (PublicUrl, FileName) VALUES ('{0}','{1}')"
 
+##SQL QUERIES
+SQL_GET_FILES='''SELECT sf.Id, sf.PublicUrl, sf.FileName, sf.Created_At FROM public.S3_Files sf;'''
+
+SQL_GET_RANDOM_FILE='''WITH aggr AS (
+	SELECT MAX(sf.Id) AS ID 
+		FROM public.S3_Files sf
+		GROUP BY sf.FileName
+	)
+SELECT sf.id,  sf.PublicUrl, sf.FileName, sf.Created_At 
+FROM aggr
+JOIN public.S3_Files sf on sf.Id=aggr.Id
+ORDER BY RANDOM() LIMIT 1'''
+
+SQL_SET_FILES="INSERT INTO public.S3_Files (PublicUrl, FileName) VALUES ('{0}','{1}')"
 ##inserts only, kind of log, no merge and unique by name
+###
 
 params = db_config()
 
@@ -33,7 +46,6 @@ def test_connect():
             conn.close()
             print('Database connection closed.')
 def get_s3_files():
-    """ query parts from the parts table """
     conn = None
     try:
         conn = psycopg2.connect(**params)
@@ -54,7 +66,25 @@ def get_s3_files():
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         logging.exception("SOME DB lever error")
-        return "exception has occured.."
+        raise
+        #return "exception has occured.."
+    finally:
+        if conn is not None:
+            conn.close()
+
+def get_single_s3_file(file_name=None):
+    conn = None
+    try:
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        cur.execute(SQL_GET_RANDOM_FILE)
+        rows = cur.fetchone()
+        return rows[1]
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        logging.exception("SOME DB lever error")
+        raise
+        #return "exception has occured.."
     finally:
         if conn is not None:
             conn.close()
