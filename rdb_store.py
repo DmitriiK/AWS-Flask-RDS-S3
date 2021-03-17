@@ -1,7 +1,7 @@
 #!./flask/Scripts/python
 # relational database module
 import psycopg2
-from config import config
+from config import db_config
 import json
 import logging
 SQL_GET_FILES='''SELECT sf."Id", sf."AWS_Identifier", sf."Created_At"
@@ -12,7 +12,7 @@ def test_connect():
     conn = None
     try:
         # read connection parameters
-        params = config()
+        params = db_config()
         conn = psycopg2.connect(**params)		
         # create a cursor
         cur = conn.cursor()
@@ -33,7 +33,7 @@ def get_s3_files():
     """ query parts from the parts table """
     conn = None
     try:
-        params = config()
+        params = db_config()
         conn = psycopg2.connect(**params)
         cur = conn.cursor()
         cur.execute(SQL_GET_FILES)

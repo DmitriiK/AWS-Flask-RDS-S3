@@ -3,7 +3,7 @@ from flask import Flask, jsonify, abort, request, redirect, render_template
 import os
 import urllib.request
 from werkzeug.utils import secure_filename
-
+import s3
 import rdb_store as rdb
 
 UPLOAD_FOLDER = 'D:/share'
@@ -33,7 +33,8 @@ def upload_file():
 		return resp
 	if file and allowed_file(file.filename):
 		filename = secure_filename(file.filename)
-		file.save(os.path.join(UPLOAD_FOLDER, filename))
+		s3.upload_file_stream(file, filename)
+        #file.save(os.path.join(UPLOAD_FOLDER, filename))
 		resp = jsonify({'message' : 'File successfully uploaded'})
 		resp.status_code = 201
 		return resp
