@@ -32,8 +32,7 @@ def upload_file():
 		resp.status_code = 400
 		return resp
 	if file and allowed_file(file.filename):
-		filename = secure_filename(file.filename)
-		s3.upload_file_stream(file, filename)
+		url=s3.upload_file_stream(file)
         #file.save(os.path.join(UPLOAD_FOLDER, filename))
 		resp = jsonify({'message' : 'File successfully uploaded'})
 		resp.status_code = 201
