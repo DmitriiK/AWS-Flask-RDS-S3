@@ -12,35 +12,36 @@ app = Flask(__name__)
 
 
 def allowed_file(filename):
-	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def upload_form():
-	return render_template('index.html')
+    return render_template('index.html')
 
 
 @app.route('/file_upload', methods=['POST'])
 def upload_file():
-	# check if the post request has the file part
-	if 'file' not in request.files:
-		resp = jsonify({'message' : 'No file part in the request'})
-		resp.status_code = 400
-		return resp
-	file = request.files['file']
-	if file.filename == '':
-		resp = jsonify({'message' : 'No file selected for uploading'})
-		resp.status_code = 400
-		return resp
-	if file and allowed_file(file.filename):
-		url=s3.upload_file_stream(file)
+    # check if the post request has the file part
+    if 'file' not in request.files:
+        resp = jsonify({'message' : 'No file part in the request'})
+        resp.status_code = 400
+        return resp
+    file = request.files['file']
+    if file.filename == '':
+        resp = jsonify({'message' : 'No file selected for uploading'})
+        resp.status_code = 400
+        return resp
+    if file and allowed_file(file.filename):
+        url=s3.upload_file_stream(file)
+        rdb.set_s3_files(file.filename, url)       
         #file.save(os.path.join(UPLOAD_FOLDER, filename))
-		resp = jsonify({'message' : 'File successfully uploaded'})
-		resp.status_code = 201
-		return resp
-	else:
-		resp = jsonify({'message' : 'Allowed file types are  png, jpg, jpeg, gif'})
-		resp.status_code = 400
-		return resp
+        resp = jsonify({'message' : 'File successfully uploaded'})
+        resp.status_code = 201
+        return resp
+    else:
+        resp = jsonify({'message' : 'Allowed file types are  png, jpg, jpeg, gif'})
+        resp.status_code = 400
+        return resp
 
 @app.route('/test_rdb_connect', methods=['GET'])
 def test_rdb_connect():
