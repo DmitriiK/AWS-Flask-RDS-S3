@@ -6,7 +6,8 @@ import json
 import logging
 
 ##SQL QUERIES
-SQL_GET_FILES='''SELECT sf.Id, sf.PublicUrl, sf.FileName, sf.Created_At FROM public.S3_Files sf;'''
+SQL_GET_FILES='SELECT sf.Id, sf.PublicUrl, sf.FileName, sf.Created_At FROM public.S3_Files sf'
+SQL_GET_FILE_BY_NAME=SQL_GET_FILES+" WHERE sf.FileName LIKE %s ORDER BY sf.Created_At DESC LIMIT 1"
 
 SQL_GET_RANDOM_FILE='''WITH aggr AS (
 	SELECT MAX(sf.Id) AS ID 
@@ -77,7 +78,10 @@ def get_single_s3_file(file_name=None):
     try:
         conn = psycopg2.connect(**params)
         cur = conn.cursor()
-        cur.execute(SQL_GET_RANDOM_FILE)
+        if (file_name==None):
+            cur.execute(SQL_GET_RANDOM_FILE)
+        else:
+             cur.execute(SQL_GET_FILE_BY_NAME,(file_name))
         rows = cur.fetchone()
         return rows[1]
         cur.close()

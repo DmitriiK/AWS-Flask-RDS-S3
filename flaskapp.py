@@ -21,7 +21,7 @@ def upload_form():
     return render_template('index.html')
 
 
-@app.route('/file_upload', methods=['POST'])
+@app.route('/api/v1.0/file_upload', methods=['POST'])
 def upload_file():
     # check if the post request has the file part
     if 'file' not in request.files:
@@ -45,22 +45,31 @@ def upload_file():
         resp.status_code = 400
         return resp
 
-@app.route('/test_rdb_connect', methods=['GET'])
+@app.route('/api/v1.0/test_rdb_connect', methods=['GET'])
 def test_rdb_connect():
     result =rdb.test_connect()
     return result  
 
-@app.route('/get_images_list', methods=['GET'])
+@app.route('/api/v1.0/get_images_list', methods=['GET'])
 def get_images_list():
     result =rdb.get_s3_files()
     return result  
 
-@app.route('/get_random_image', methods=['GET'])
+@app.route('/api/v1.0/get_random_image', methods=['GET'])
 def get_random_image():
     url =rdb.get_single_s3_file()
     return redirect(url)    
     ##image = imread(url)
-    
+
+@app.route('/api/v1.0/get_image_by_name', methods=['POST'])
+def get_image_by_name():
+    file_name=request.form['fname']
+    if file_name == '':
+        resp = jsonify({'message' : 'enter file name please'})
+        resp.status_code = 400
+        return resp
+    url =rdb.get_single_s3_file(file_name)
+    return redirect(url)    
    
 
 if __name__ == '__main__':
