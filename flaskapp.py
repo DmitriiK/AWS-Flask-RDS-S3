@@ -69,8 +69,11 @@ def get_image_by_name():
         resp.status_code = 400
         return resp
     url =rdb.get_single_s3_file(file_name)
-    return redirect(url)    
-   
+    return redirect(url)  
+
+@app.route('/api/v1.0/get_instanse_path', methods=['GET'])
+def get_instanse_path():
+    return app.instance_path   
 
 if __name__ == '__main__':
     app.run(debug=True)

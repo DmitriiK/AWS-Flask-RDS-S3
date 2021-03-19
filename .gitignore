@@ -3,3 +3,6 @@ __pycache__/flaskapp.cpython-39.pyc
 flask/
 __pycache__/s3.cpython-39.pyc
 __pycache__/rdb_store.cpython-39.pyc
+__pycache__/rdb_store.cpython-39.pyc
+__pycache__/rdb_store.cpython-39.pyc
+app.log

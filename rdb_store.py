@@ -26,9 +26,10 @@ SQL_SET_FILES="INSERT INTO public.S3_Files (PublicUrl, FileName) VALUES (%s,%s)"
 params = db_config()
 
 logging.basicConfig(filename='app.log', filemode='w', format='%(asctime)s -%(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.ERROR)
-
+# for some reason for ubuntu we should write absolute path wothout first slash:  filename='home/ubuntu/flaskapp/app.log'
 def test_connect():
     """ Connect to the PostgreSQL database server """
+    logging.error("test log")
     conn = None
     try:
         # read connection parameters
