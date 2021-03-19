@@ -3,7 +3,7 @@ from flask import Flask, jsonify, abort, request, redirect, render_template
 import os
 import urllib.request
 from werkzeug.utils import secure_filename
-from imageio import imread
+#from imageio import imread
 
 import s3
 import rdb_store as rdb

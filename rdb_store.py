@@ -19,11 +19,13 @@ FROM aggr
 JOIN public.S3_Files sf on sf.Id=aggr.Id
 ORDER BY RANDOM() LIMIT 1'''
 
-SQL_SET_FILES="INSERT INTO public.S3_Files (PublicUrl, FileName) VALUES ('{0}','{1}')"
+SQL_SET_FILES="INSERT INTO public.S3_Files (PublicUrl, FileName) VALUES (%s,%s)"
 ##inserts only, kind of log, no merge and unique by name
 ###
 
 params = db_config()
+
+logging.basicConfig(filename='app.log', filemode='w', format='%(asctime)s -%(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.ERROR)
 
 def test_connect():
     """ Connect to the PostgreSQL database server """
@@ -41,7 +43,7 @@ def test_connect():
 	# close the communication with the PostgreSQL
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
+        logging.error(error)
     finally:
         if conn is not None:
             conn.close()
@@ -61,7 +63,7 @@ def get_s3_files():
                 # 'Created_At':row[2] #Object of type datetime is not JSON serializable
             } for row in rows
         ] #
-        json_output = json.dumps(objects)
+        json_output = json.dumps(objects, indent=4, sort_keys=True)
         return json_output
         #print("The number of parts: ", cur.rowcount)
         cur.close()
@@ -81,8 +83,9 @@ def get_single_s3_file(file_name=None):
         if (file_name==None):
             cur.execute(SQL_GET_RANDOM_FILE)
         else:
-             cur.execute(SQL_GET_FILE_BY_NAME,(file_name))
+             cur.execute(SQL_GET_FILE_BY_NAME,(file_name,))
         rows = cur.fetchone()
+        if (rows==None): return None
         return rows[1]
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -99,11 +102,10 @@ def set_s3_files(file_name, s3_url):
         conn = psycopg2.connect(**params)
         cur = conn.cursor()
         x=len(s3_url)
-        sql=SQL_SET_FILES.format(s3_url, file_name) #todo - figure out how we can levarage parameters
-        cur.execute(sql)       
+        cur.execute(SQL_SET_FILES, (s3_url, file_name,) )       
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
-        logging.exception("SOME DB lever error")
+        logging.exception("SOME DB lever error in set_s3_files method s3_url=%s, filename=%s",s3_url, file_name)
         raise
         #return "exception has occured.."
     finally:

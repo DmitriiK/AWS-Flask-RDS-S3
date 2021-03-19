@@ -9,6 +9,8 @@ def db_config(filename=MAIN_CONFIG_FILE):
     # get section, default to postgresql
     section='postgresql'
     db = {}
+    # for ubuntu it is not working for some reason ; return {'host': 'postges.cbzpdv2uvyom.eu-central-1.rds.amazonaws.com', 'database': 'AWS_Edu', 'user': 'postgres', 'password': 'ppostgres'}
+
     if parser.has_section(section):
         params = parser.items(section)
         for param in params:
@@ -25,3 +27,6 @@ def s3_config(filename=MAIN_CONFIG_FILE, ):
     else:
         raise Exception('Section {0} not found in the {1} file'.format(section, filename))
     return db
+
+if __name__ == '__main__':
+    print(s3_config())

@@ -7,12 +7,11 @@ bucket_name = s3_config()
 s3 = boto3.client('s3')
 def upload_file_stream(fs): 
     ret= s3.upload_fileobj(fs, bucket_name, fs.filename)
+    expiresIn=7*24*60*60-1 # must be less than a week
     url = s3.generate_presigned_url(
     ClientMethod='get_object',
-    Params={
-        'Bucket': bucket_name,
-        'Key': fs.filename
-    }
+    Params={'Bucket': bucket_name,'Key': fs.filename},
+    ExpiresIn=expiresIn
     )
     return url
 
