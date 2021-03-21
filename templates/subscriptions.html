@@ -1,0 +1,22 @@
+<!doctype html>
+<title>s3 Event Subscriptions</title>
+
+
+
+<fieldset style="width:270px">
+	<legend><Subscribe>
+	<Un-subscribe></Un-subscribe></legend>
+	<p>Put email to subscribe un-subscribe from S3 notifiacations</p>
+	<form method="post" action="/api/v1.0/subscribe">
+			<p>
+				<input type="text" name="email" autocomplete="off" required>
+			</p>
+			<p>
+				<input type="checkbox" id="IsSubscr" name="IsSubscr" value="true">
+				<label for="IsSubscr"> (un)Check to (un)subscibe/</label><br>
+			</p>		
+			<p>
+				<input type="submit" value="Change subsciption status">
+			</p>
+	</form>
+</fieldset>  

@@ -20,6 +20,9 @@ def allowed_file(filename):
 def upload_form():
     return render_template('index.html')
 
+@app.route('/subscriptions')
+def subsciptions_form():
+    return render_template('subscriptions.html')
 
 @app.route('/api/v1.0/file_upload', methods=['POST'])
 def upload_file():
@@ -69,7 +72,13 @@ def get_image_by_name():
         resp.status_code = 400
         return resp
     url =rdb.get_single_s3_file(file_name)
-    return redirect(url)  
+    return redirect(url) 
+
+@app.route('/api/v1.0/subscribe', methods=['POST'])
+def subscribe_or_un_subscribe():
+    email=request.form['email']
+    is_subscr=request.form['IsSubscr']
+    return "OK"
 
 @app.route('/api/v1.0/get_instanse_path', methods=['GET'])
 def get_instanse_path():
