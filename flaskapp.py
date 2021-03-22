@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 
 import s3
 import rdb_store as rdb
+from sns import SNS_Subscription
 
 UPLOAD_FOLDER = 'D:/share'
 ALLOWED_EXTENSIONS = set([ 'png', 'jpg', 'jpeg', 'gif'])
@@ -78,7 +79,12 @@ def get_image_by_name():
 def subscribe_or_un_subscribe():
     email=request.form['email']
     is_subscr=request.form['IsSubscr']
-    return "OK"
+    if is_subscr:
+       subscr_arn= SNS_Subscription.subscribe(email)
+       return  subscr_arn # '{"arn":{}}'.format(subscr_arn)
+    else:
+        SNS_Subscription.un_subscribe(email)
+        return "OK"
 
 @app.route('/api/v1.0/get_instanse_path', methods=['GET'])
 def get_instanse_path():

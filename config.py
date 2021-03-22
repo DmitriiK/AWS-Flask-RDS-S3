@@ -5,7 +5,15 @@ MAIN_CONFIG_FILE='settings.ini'
 
 parser = ConfigParser()
 parser.read(MAIN_CONFIG_FILE)
-def db_config(filename=MAIN_CONFIG_FILE):
+
+def get_config_value(section, key ):
+    if parser.has_section(section):
+        config_value=parser[section][key]
+        return config_value
+    else:
+        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+
+def db_config():
     # get section, default to postgresql
     section='postgresql'
     db = {}
@@ -19,14 +27,14 @@ def db_config(filename=MAIN_CONFIG_FILE):
         raise Exception('Section {0} not found in the {1} file'.format(section, filename))
     return db
 
-def s3_config(filename=MAIN_CONFIG_FILE, ):
-    section='s3'
-    if parser.has_section(section):
-        bucket_name=parser[section]["bucket_name"]
-        return bucket_name
-    else:
-        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
-    return db
+def s3_config( ):
+    def sns_config( ):
+        return get_config_value('s3',"bucket_name")
+
+
+def sns_config( ):
+    return get_config_value('sns',"bucket_name")
+
 
 if __name__ == '__main__':
-    print(s3_config())
+    print (s3_config())
