@@ -28,8 +28,7 @@ def db_config():
     return db
 
 def s3_config( ):
-    def sns_config( ):
-        return get_config_value('s3',"bucket_name")
+    return get_config_value('s3',"bucket_name")
 
 
 def sns_config( ):

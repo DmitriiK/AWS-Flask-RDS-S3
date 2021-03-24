@@ -1,8 +1,9 @@
 #!./flask/Scripts/python
 # aws s3 iteraction  module
 import boto3
-from botocore import errorfactory #.NoSuchBucket
+from botocore import errorfactory
 import json
+import urllib.parse
 import logging
 
 from config import s3_config
@@ -14,19 +15,29 @@ s3r = boto3.resource('s3')  # still now very aware what is the difference betwee
 def upload_file_stream(fs): 
     try:
         if s3r.Bucket(bucket_name).creation_date is None:
-            CreateBucket(bucket_name);
+            CreateBucket(bucket_name)
+            # we should apply policy to bucket to make files available by simple url
         ret= s3c.upload_fileobj(fs, bucket_name, fs.filename)
     except errorfactory.ClientError as err:
         logger.exception(err)
         #err_code=err.response['Error']['Code']
         #if err_code=='NoSuchBucket':            CreateBucket(bucket_name)
-        raise 
+        raise
+    #assuming we are not using folders f"https://s3.{s3c.meta.region_name}.amazonaws.com/{bucket_name}/{folder}...N/{file_name}"
+
+    response = s3c.get_bucket_location(Bucket=bucket_name)
+    region= response['LocationConstraint'] ##s3c.meta.region_name - is from .aws config file
+    utf8_file_name=urllib.parse.quote(fs.filename)
+    url = f"https://{bucket_name}.s3.{region}.amazonaws.com/{utf8_file_name}"
+    
+    """ generate_presigned_url - not working at Ubuntu for some reason
     expiresIn=7*24*60*60-1 # must be less than a week
     url = s3c.generate_presigned_url(
     ClientMethod='get_object',
     Params={'Bucket': bucket_name,'Key': fs.filename},
     ExpiresIn=expiresIn
     )
+    """
     return url
 
 def CreateBucket(bucket_name):

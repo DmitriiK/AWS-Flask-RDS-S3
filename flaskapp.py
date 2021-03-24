@@ -1,5 +1,5 @@
 #!./flask/Scripts/python
-from flask import Flask, jsonify, abort, request, redirect, render_template
+from flask import Flask, jsonify, abort, request, Response,  redirect, render_template
 import os
 import urllib.request
 from werkzeug.utils import secure_filename
@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 
 import s3
 import rdb_store as rdb
+
 import sns
 
 UPLOAD_FOLDER = 'D:/share'
@@ -16,6 +17,13 @@ app = Flask(__name__)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def json_response(json_str):
+        resp = Response(response=json_str,
+                    status=200,
+                    mimetype="application/json")
+        return resp
+
 
 @app.route('/')
 def upload_form():
@@ -58,7 +66,7 @@ def test_rdb_connect():
 @app.route('/api/v1.0/get_images_list', methods=['GET'])
 def get_images_list():
     result =rdb.get_s3_files()
-    return result  
+    return json_response(result)  
 
 @app.route('/api/v1.0/get_random_image', methods=['GET'])
 def get_random_image():
