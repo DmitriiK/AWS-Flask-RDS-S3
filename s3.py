@@ -3,25 +3,26 @@
 import boto3
 from botocore import errorfactory #.NoSuchBucket
 import json
+import logging
 
 from config import s3_config
 
+logger = logging.getLogger(__name__)
 bucket_name = s3_config()
-bucket_name='nonexistingbucket3'
-s3 = boto3.client('s3')
+s3c = boto3.client('s3')
+s3r = boto3.resource('s3')  # still now very aware what is the difference between resouce and client, but for educatin we can use both
 def upload_file_stream(fs): 
     try:
-        ret= s3.upload_fileobj(fs, bucket_name, fs.filename)
+        if s3r.Bucket(bucket_name).creation_date is None:
+            CreateBucket(bucket_name);
+        ret= s3c.upload_fileobj(fs, bucket_name, fs.filename)
     except errorfactory.ClientError as err:
-        print(err)
-        err_code=err.response['Error']['Code']
-        if err_code=='NoSuchBucket':
-            CreateBucket(bucket_name)
-            ret= s3.upload_fileobj(fs, bucket_name, fs.filename) #one more try
-        else:
-            raise 
+        logger.exception(err)
+        #err_code=err.response['Error']['Code']
+        #if err_code=='NoSuchBucket':            CreateBucket(bucket_name)
+        raise 
     expiresIn=7*24*60*60-1 # must be less than a week
-    url = s3.generate_presigned_url(
+    url = s3c.generate_presigned_url(
     ClientMethod='get_object',
     Params={'Bucket': bucket_name,'Key': fs.filename},
     ExpiresIn=expiresIn
